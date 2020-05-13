@@ -75,7 +75,16 @@
         }
         
         */
-
+        $this->page->begin_block( "magicshop_magicshop", "player" );
+        foreach( $players as $playerId => $info )
+        {
+            $this->page->insert_block( "player", array(
+                "PLAYER_ID" => $playerId,
+                "PLAYER_NAME" => $info['player_name'],
+                "PLAYER_COLOUR" => $info['player_color']
+                
+             ) );
+        }
 
 
         /*********** Do not change anything below this line  ************/

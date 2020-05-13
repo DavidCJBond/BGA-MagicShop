@@ -67,6 +67,20 @@
     }
 */
 
+#playershops {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.playertable {
+    margin: 20px;
+}
+
+.playertableshop{
+    width: 372px;
+    height: 526px;
+    background: url('img/shopboard.jpg');
+}
 
 
 
