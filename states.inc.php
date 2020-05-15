@@ -48,30 +48,36 @@
 */
 
 //    !! It is not a good idea to modify this file when a game is running !!
+// define contants for state ids
+if (!defined('STATE_GAME_END')) { // ensure this block is only invoked once, since it is included multiple times
+    define("STATE_GAME_SETUP", 1);
+    define("STATE_ROUND_START", 2);
+    define("STATE_PLAYER_TURN_START", 5);
+    define("STATE_PLAYER_TURN_1", 10);
+    define("STATE_PLAYER_TURN_2", 20);
+    define("STATE_PLAYER_TURN_3", 30);
+    define("STATE_PLAYER_TURN_4", 40);
+    define("STATE_PLAYER_TURN_END", 50);
+    define("STATE_ROUND_END", 60);
+//    define("STATE_", );
+    define("STATE_GAME_END", 99);
+ }
+
+
 
  
 $machinestates = array(
 
     // The initial state. Please do not modify.
-    1 => array(
+    STATE_GAME_SETUP => array(
         "name" => "gameSetup",
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array( "" => 2 )
+        "transitions" => array( "" => STATE_ROUND_START )
     ),
     
-    // Note: ID=2 => your first state
 
-    2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must play a card or pass'),
-    		"descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array( "playCard", "pass" ),
-    		"transitions" => array( "playCard" => 2, "pass" => 2 )
-    ),
-    
 /*
     Examples:
     
@@ -95,6 +101,77 @@ $machinestates = array(
 
 */    
    
+    STATE_ROUND_START => array(
+    	"name" => "roundStart",
+    	"description" => "",
+        "type" => "game",
+        "action" => "stRoundStart",
+    	"transitions" => array( "playerTurnStart" => STATE_PLAYER_TURN_START )
+    ),
+
+    STATE_PLAYER_TURN_START => array(
+    	"name" => "playerTurnStart",
+    	"description" => "",
+        "type" => "game",
+        "action" => "stPlayerTurnStart"
+    	"transitions" => array( "playerTurn1" => STATE_PLAYER_TURN_1 )
+    ),
+
+    STATE_PLAYER_TURN_1 => array(
+    	"name" => "playerTurn1",
+    	"description" => "",
+        "type" => "game",
+        "action" => "stPlayerTurn1"
+    	"transitions" => array( "playerTurn2" => STATE_PLAYER_TURN_2 )
+    ),
+
+    STATE_PLAYER_TURN_2 => array(
+        "name" => "playerTurn2",
+        "description" => clienttranslate('${actplayer} may activate a potion'),
+        "descriptionmyturn" => clienttranslate('${you} may activate a potion'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "activatePotion", "pass" ),
+        "transitions" => array( "playerTurn3" => STATE_PLAYER_TURN_3 )
+    ),
+
+    STATE_PLAYER_TURN_3 => array(
+        "name" => "playerTurn3",
+        "description" => clienttranslate('${actplayer} may stock their shop'),
+        "descriptionmyturn" => clienttranslate('${you} may stock your shop '),
+        "type" => "activeplayer",
+        "possibleactions" => array( "makepotionitem", "pass" ),
+        "transitions" => array( "playerTurn4" => STATE_PLAYER_TURN_4 )
+    ),
+
+    STATE_PLAYER_TURN_4 => array(
+        "name" => "playerTurn4",
+        "description" => clienttranslate('${actplayer} must play a card or pass'),
+        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "playCard", "pass" ),
+        "transitions" => array( "playerTurnEnd" => STATE_PLAYER_TURN_END )
+    ),
+
+    STATE_PLAYER_TURN_END => array(
+        "name" => "playerTurnEnd",
+        "description" => "",
+        "type" => "game",
+        "action" => "stPlayerTurnEnd"
+        "transitions" => array( "playerTurnStart" => STATE_PLAYER_TURN_START, "roundEnd" => STATE_ROUND_END )
+    ),
+
+    STATE_ROUND_END => array(
+        "name" => "roundEnd",
+        "description" => "",
+        "type" => "game",
+        "action" => "stRoundEnd"
+        "transitions" => array( "roundStart" => STATE_ROUND_START, "gameEnd" => STATE_GAME_END )
+    ),
+
+
+
+
+
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     99 => array(
