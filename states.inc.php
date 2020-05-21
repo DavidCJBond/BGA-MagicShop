@@ -113,7 +113,7 @@ $machinestates = array(
     	"name" => "playerTurnStart",
     	"description" => "",
         "type" => "game",
-        "action" => "stPlayerTurnStart"
+        "action" => "stPlayerTurnStart",
     	"transitions" => array( "playerTurn1" => STATE_PLAYER_TURN_1 )
     ),
 
@@ -121,7 +121,7 @@ $machinestates = array(
     	"name" => "playerTurn1",
     	"description" => "",
         "type" => "game",
-        "action" => "stPlayerTurn1"
+        "action" => "stPlayerTurn1",
     	"transitions" => array( "playerTurn2" => STATE_PLAYER_TURN_2 )
     ),
 
@@ -156,7 +156,7 @@ $machinestates = array(
         "name" => "playerTurnEnd",
         "description" => "",
         "type" => "game",
-        "action" => "stPlayerTurnEnd"
+        "action" => "stPlayerTurnEnd",
         "transitions" => array( "playerTurnStart" => STATE_PLAYER_TURN_START, "roundEnd" => STATE_ROUND_END )
     ),
 
@@ -164,7 +164,7 @@ $machinestates = array(
         "name" => "roundEnd",
         "description" => "",
         "type" => "game",
-        "action" => "stRoundEnd"
+        "action" => "stRoundEnd",
         "transitions" => array( "roundStart" => STATE_ROUND_START, "gameEnd" => STATE_GAME_END )
     ),
 
