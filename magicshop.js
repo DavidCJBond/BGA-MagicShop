@@ -93,7 +93,8 @@ define([
                     this.playerHand.addToStockWithId(card.type, this.itemTypeId + card.id);
                 }
                 */
-                for(var card of gamedatas['hand']){
+                for(var cardId in gamedatas['hand']){
+                    var card = gamedatas['hand'][cardId];
                     this.playerHand.addToStockWithId(card.type, card.id);
                 }
 
