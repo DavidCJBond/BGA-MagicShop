@@ -39,6 +39,8 @@ class magicshop extends Table
             //    "my_first_game_variant" => 100,
             //    "my_second_game_variant" => 101,
             //      ...
+            'gameEnd' => 10,
+            'firstPlayer' => 11,
         ) );  
 
         //Deck init
@@ -98,6 +100,7 @@ class magicshop extends Table
 
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
+        self::setGameStateInitialValue('gameEnd', 0);
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -108,7 +111,8 @@ class magicshop extends Table
        
 
         // Activate first player (which is in general a good idea :) )
-        $this->activeNextPlayer();
+        $firstPlayerId = $this->activeNextPlayer();
+        self::setGameStateInitialValue('firstPlayer', $firstPlayerId);
         
         
         //Populate decks
@@ -386,7 +390,7 @@ class magicshop extends Table
 
         $player_id = self::getActivePlayerId();
 
-        if(countCardInLocation('shop', $player_id) < 3){
+        if($this->cardDeck->countCardInLocation('shop', $player_id) < 3){
             throw new BgaUserException(self::_("You can not draw advanced potions, you do not have enough stock in your shop"));
         }
 
@@ -508,22 +512,38 @@ class magicshop extends Table
         $this->gamestate->nextState();
     }
 */
+
+// check if any players have enough cards in shop to trigger end game and notify players
     function stPlayerTurnEnd(){
-        //todo
-     //activate next player
+     //check end game condition
+     $shopCount = $this->cardDeck->countCardsByLocationArgs('shop');
+     foreach($shopCount as $id => $value){
+        if($value >= 8){
+            self::setGameStateValue('gameEnd', 1);
+            break;
+        }
+     }
+     //next player or next round
+     $nextPlayer = $this->activeNextPlayer();
+     if($nextPlayer == self::getGameStateValue('firstPlayer')){
+         $this->gamestate->nextState('roundEnd');
+     } else {
+         $this->gamestate->nextState('playerTurnStart');
+     }
 
     }
 
+    // check if game end and score
     function stRoundEnd(){
      //todo
      //check game end and move to next round
-     /*
-         if(gameend){
+     
+         if(self::getGameStateValue('gameEnd') == 1){
               $this->gamestate->nextState("gameEnd");
           } else {
               $this->gamestate->nextstate("roundStart");
           }
-          */
+          
     }
 
 //////////////////////////////////////////////////////////////////////////////
