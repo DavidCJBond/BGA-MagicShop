@@ -88,6 +88,13 @@
     background: url('img/shopboard.jpg');
 }
 
+.cardBack {
+    width: 103px;
+    height: 156px;
+    background: url('img/spritesheet.jpg');
+    background-position: 0px, -156px;
+}
+
 .test{
     z-index: 1;
     width:20px;

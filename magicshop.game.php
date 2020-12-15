@@ -193,6 +193,9 @@ class magicshop extends Table
         // $handItem = $this->cardsItem->getCardsInLocation( 'hand', $current_player_id );
         // $result['hand'] = array_merge($handBasic, $handAdvanced, $handItem);
         $result['hand'] = $this->cardDeck->getCardsInLocation('hand', $current_player_id);
+
+        //item deck
+        $result['deckItem'] = $this->cardDeck->getCardsInLocation('deckItem');
         
         return $result;
     }

@@ -39,6 +39,8 @@ define([
                 this.shopWidth = 372;
                 this.shopHeight = 526;
 
+                this.stockItemDisplay = null;
+
 
 
 
@@ -154,6 +156,22 @@ define([
                         }), 'tests');
                         this.shopZonesJC[player_id].placeInZone('test_' + player_id + '_' + i+'jc');
                     }
+                }
+
+                //setup item display
+                this.stockItemDisplay = new ebg.stock();
+                this.stockItemDisplay.create(this, $('itemDeckDisplay'), this.cardWidth, this.cardHeight);
+                this.stockItemDisplay.onItemCreate = dojo.hitch( this, 'setupNewCard' );
+
+                this.stockItemDisplay.image_items_per_row = 10;
+                for (var cardType in gamedatas.cardInfo) {
+                    if(gamedatas.cardInfo[cardType]['type'] == 'item'){
+                        this.stockItemDisplay.addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);
+                    }
+                }
+                for(var cardId in gamedatas['deckItem']){
+                    var card = gamedatas['deckItem'][cardId];
+                    this.stockItemDisplay.addToStockWithId(card.type, card.id);
                 }
 
 

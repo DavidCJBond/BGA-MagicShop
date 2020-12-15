@@ -13,18 +13,20 @@
 
 <div id="deckWrap" class="whiteblock">
     <span id="basicPotionDeckWrap">
-        {BASIC_POTIONS}
-        <div id="basicPotionDeck">
+        <div>
+            {BASIC_POTIONS}
+        </div>
+        <div id="basicPotionDeck" class="cardBack">
         </div>
     </span>
     <span id="advancedPotionDeckWrap">
         {ADVANCED_POTIONS}
-        <div id="advancedPotionDeck">
+        <div id="advancedPotionDeck" class="cardBack">
         </div>
     </span>
     <span id="itemDeckWrap">
         {ITEMS}
-        <div id="itemDeck">
+        <div id="itemDeck" class="cardBack">
         </div>
     </span>
 </div>
