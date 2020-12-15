@@ -36,7 +36,8 @@
   	    // Get players & players number
         $players = $this->game->loadPlayersBasicInfos();
         $players_nbr = count( $players );
-
+			global $g_user;
+			$currentPlayerId = $g_user->get_id();
         /*********** Place your code below:  ************/
 
 
@@ -75,16 +76,31 @@
         }
         
         */
-        $this->page->begin_block( "magicshop_magicshop", "player" );
+
+        $this->tpl['BASIC_POTIONS'] = _("Basic Potions");
+        $this->tpl['ADVANCED_POTIONS'] = _("Advanced Potions");
+        $this->tpl['ITEMS'] = _("Items");
+
+        $this->page->begin_block( "magicshop_magicshop", "playerShops" );
         foreach( $players as $playerId => $info )
         {
-            $this->page->insert_block( "player", array(
-                "PLAYER_ID" => $playerId,
-                "PLAYER_NAME" => $info['player_name'],
-                "PLAYER_COLOUR" => $info['player_color']
-                
-             ) );
+            if($playerId != $currentPlayerId){
+                $this->page->insert_block( "playerShops", array(
+                    "PLAYER_ID" => $playerId,
+                    "PLAYER_NAME" => $info['player_name'],
+                    "PLAYER_COLOUR" => $info['player_color']
+                ) );
+            }
         }
+
+    
+        $this->tpl["CURRENT_PLAYER_ID"] = $currentPlayerId;
+//        $this->tpl["CURRENT_PLAYER_SHOP"] = $players[$currentPlayerId]['player_name'];
+//        $this->tpl["CURRENT_PLAYER_COLOUR"] = $players[$currentPlayerId]['player_color'];
+        $this->tpl["CURRENT_PLAYER_SHOP"] = _('Your Shop'); //$players[$currentPlayerId]['player_name'];
+        $this->tpl["CURRENT_PLAYER_HAND"] = _('Your Hand');
+
+
 
 
         /*********** Do not change anything below this line  ************/

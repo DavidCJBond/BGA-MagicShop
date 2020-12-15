@@ -22,8 +22,8 @@ require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
 class magicshop extends Table
 {
-	function __construct( )
-	{
+    function __construct( )
+    {
         // Your global variables labels:
         //  Here, you can assign labels to global variables you are using for this game.
         //  You can use any number of global variables with IDs between 10 and 99.
@@ -39,12 +39,29 @@ class magicshop extends Table
             //    "my_first_game_variant" => 100,
             //    "my_second_game_variant" => 101,
             //      ...
-        ) );        
-	}
-	
+        ) );  
+
+        //Deck init
+        // $this->cardsBasic = self::getNew( "module.common.deck" );
+        // $this->cardsBasic->init( "cardsBasic" );
+        
+        // $this->cardsAdvanced = self::getNew( "module.common.deck" );
+        // $this->cardsAdvanced->init( "cardsAdvanced" );
+        
+        // $this->cardsItem = self::getNew( "module.common.deck" );
+        // $this->cardsItem->init( "cardsItem" );
+        
+
+        $this->cardDeck = self::getNew("module.common.deck");
+        $this->cardDeck->init("cardDeck");
+        $this->cardDeck->autoreshuffle_custom = array('deckBasic' => 'discardBasic', 'deckAdvanced' => 'discardAdvanced');
+        $this->cardDeck->autoreshuffle = true;
+        
+    }
+    
     protected function getGameName( )
     {
-		// Used for translations and stuff. Please do not modify.
+        // Used for translations and stuff. Please do not modify.
         return "magicshop";
     }	
 
@@ -92,6 +109,51 @@ class magicshop extends Table
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
+        
+        
+        //Populate decks
+        $basic = array();
+        $advanced = array();
+        $item = array();
+        
+        foreach( $this->cards as $cardTypeId => $cardDetail ) {
+            //Basic
+            if($cardDetail['type'] == 'basic'){
+                $basic[] = array('type' => $cardTypeId, 'type_arg' => 0, 'nbr' => $cardDetail['count']);
+                
+            //Advanced
+            } elseif ($cardDetail['type'] == 'advanced'){
+                $advanced[] = array('type' => $cardTypeId, 'type_arg' => 1, 'nbr' => $cardDetail['count']);
+                
+            //Item
+            } elseif ($cardDetail['type'] == 'item'){
+                $item[] = array('type' => $cardTypeId, 'type_arg' => 2, 'nbr' => $cardDetail['count']);
+            
+            }
+            
+        }
+        
+        //$this->cardsBasic->createCards($basic, 'deck');
+        //$this->cardsAdvanced->createCards($advanced, 'deck');
+        //$this->cardsItem->createCards($item, 'deck');
+        $this->cardDeck->createCards($basic, 'deckBasic');
+        $this->cardDeck->createCards($advanced, 'deckAdvanced');
+        $this->cardDeck->createCards($item, 'deckItem');
+        // $this->cardsBasic->shuffle('deck');
+        // $this->cardsAdvanced->shuffle('deck');
+        $this->cardDeck->shuffle('deckBasic');
+        $this->cardDeck->shuffle('deckAdvanced');
+
+        //deal out starting hands
+        foreach( $players as $player_id => $player ){
+            //$cards = $this->cardsBasic->pickCards( 3, 'deck', $player_id );
+            $cards = $this->cardDeck->pickCards( 3, 'deckBasic', $player_id );
+           
+            // Notify player about his cards
+            self::notifyPlayer( $player_id, 'drawCards', '', array( 
+                'cards' => $cards
+            ) );
+        }
 
         /************ End of the game initialization *****/
     }
@@ -108,6 +170,10 @@ class magicshop extends Table
     protected function getAllDatas()
     {
         $result = array();
+
+        //send card information to client setup
+        $result['cardInfo'] = $this->cards;
+
     
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
     
@@ -117,7 +183,13 @@ class magicshop extends Table
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-  
+        // Cards in player hand      
+        // $handBasic = $this->cardsBasic->getCardsInLocation( 'hand', $current_player_id );
+        // $handAdvanced = $this->cardsAdvanced->getCardsInLocation( 'hand', $current_player_id );
+        // $handItem = $this->cardsItem->getCardsInLocation( 'hand', $current_player_id );
+        // $result['hand'] = array_merge($handBasic, $handAdvanced, $handItem);
+        $result['hand'] = $this->cardDeck->getCardsInLocation('hand', $current_player_id);
+        
         return $result;
     }
 
@@ -146,8 +218,32 @@ class magicshop extends Table
     /*
         In this space, you can put any utility methods useful for your game logic
     */
+    
+    /*
+        Id conversion
+        +0 basic
+        +1 advanced
+        +2 item
+    */
+    function comboToId($id){
+        $typeOffset = $id % 3;
+        $id -= $typeOffset;
+        $id /= 3;
+        if($typeOffset == 0){
+            $type = 'basic';
+        } elseif ($typeOffset == 1){
+            $type = 'advanced';
+        } elseif ($typeOffset == 2){
+            $type = 'item';
+        }
+        return array('id' => $id, 'type' => $type);
+    }
 
-
+    function idToCombo($id, $type){
+        $id *= 3;
+        $id += $type;
+        return $id;
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
@@ -183,6 +279,166 @@ class magicshop extends Table
     }
     
     */
+     
+     function activatePotion() {
+     //todo
+     //set potion active
+         $this->gamestate->nextstate("playerTurn3");
+     }
+     
+     //target: id of card to create
+     //sources: array of id's of cards to be used to pay for the card
+     function makePotionItem($targetId, $sourceIds) {
+     //todo
+     //stock shop with potion or item from hand
+        self::checkAction('makePotionItem');
+        //add cost, subtract resources, check each ingredient for <= 0
+
+        if(!isset($this->cards[$target])){
+            throw new BgaVisibleSystemException ( self::_("An error has occured (Error A3a) please refresh your page") );
+        }
+        $costGold = $this->cards[$target]['costGold'];
+        $costRes = array('A' => 0, 'B' =>0, 'C' =>0, 'D' => 0, 'E' => 0);
+        foreach($this->cards[$target]['costIngredients'] as $res){
+            $costRes[$res]++;
+        }
+        
+        foreach($sources as $source){
+            if(!isset($this->cards[$source])){
+                throw new BgaVisibleSystemException ( self::_("An error has occured (Error A3b) please refresh your page") );
+            }
+            if($this->cards[$source]['valueType'] == 'ingredient'){
+                foreach($this->cards[$source]['valueIngredients'] as $res){
+                    $costRes[$res]--;
+                }
+            } else {
+                $costGold -= $this->cards[$source]['valueIngredients'];
+            }
+        }
+
+        $paidRes = true;
+        foreach($costRes as $key => $value){
+            if($value > 0){
+                $paidRes = false;
+                break;
+            }
+        }
+
+        //if all checks out perform the action
+        if($paidRes || $costGold <= 0){
+            //move target to shop
+
+            //discard resources from hand
+
+        }
+
+
+        
+
+
+
+         $this->gamestate->nextstate();
+     
+     }
+     
+     function pass() {
+        $this->checkAction('pass');
+        //move to next state
+        $this->gamestate->nextstate();
+     }
+     
+     function playCard() {
+     
+     }
+
+     function actionDrawBasic(){
+        $this->checkAction('drawBasic');
+
+        $player_id = self::getActivePlayerId();
+
+        $picked = $this->cardDeck->pickCards(2,'deckBasic', $player_id);
+        $count = count($picked); 
+        
+        if($count == 0){
+            //deck is empty
+            throw new BgaUserException(self::_("You can't draw more basic potions, the deck is empty!"));
+        }
+
+        //Notify the reciving player the cards received
+        self::notifyPlayer($player_id, 'cardDrawPersonal','', array(
+            'cards' => $picked
+        ) );
+
+
+        // Notify all players that cards were drawn
+        self::notifyAllPlayers( 'cardDraw', clienttranslate( '${player_name} draws ${count} basic potions' ), array(
+            'player_id' => $player_id,
+            'player_name' => self::getActivePlayerName(),
+            'type' => 'basic',
+            'count' => $count,
+        ) );
+
+        $this->gamestate->nextstate();
+     }
+
+     function actionDrawAdvanced(){
+        $this->checkAction('drawAdvanced');
+
+        $player_id = self::getActivePlayerId();
+
+        if(countCardInLocation('shop', $player_id) < 3){
+            throw new BgaUserException(self::_("You can not draw advanced potions, you do not have enough stock in your shop"));
+        }
+
+        $picked = $this->cardDeck->pickCards(1,'deckAdvanced', $player_id);
+        $count = count($picked); 
+        
+        if($count == 0){
+            //deck is empty
+            throw new BgaUserException(self::_("You can not draw more advanced potions, the deck is empty!"));
+        }
+
+        //Notify the reciving player the cards received
+        self::notifyPlayer($player_id, 'cardDrawPersonal','', array(
+            'cards' => $picked
+        ) );
+
+
+        // Notify all players that cards were drawn
+        self::notifyAllPlayers( 'cardDraw', clienttranslate( '${player_name} draws ${count} advanced potion' ), array(
+            'player_id' => $player_id,
+            'player_name' => self::getActivePlayerName(),
+            'type' => 'advanced',
+            'count' => $count,
+        ) );
+
+        $this->gamestate->nextstate();
+
+     }
+
+     function actionDrawItem($itemId){
+        $this->checkAction('drawItem');
+
+        $player_id = self::getActivePlayerId();
+
+        $advancedCount = count($this->cardDeck->getCardsOfTypeInLocation( null, $type_arg=1, 'shop', $location_arg = $player_id ));
+        self::dump('actionDrawItem advanced count', $advancedCount);
+
+        if($advancedCount < 2){ //2 advanced cards
+            throw new BgaUserException(self::_("You can not draw items, you do not have enough advanced potions in your shop"));
+        }
+
+        if($this->cardDeck->getCard($itemId)['location'] != 'deckItem'){
+            throw new BgaUserException(self::_("You can not draw that item, it is not avalible in the deck"));
+        }
+
+        $this->cardDeck->moveCard($itemId, 'hand', $player_id);
+
+        $this->gamestate->nextstate();
+     }
+
+
+     
 
     
 //////////////////////////////////////////////////////////////////////////////
@@ -234,6 +490,42 @@ class magicshop extends Table
     }    
     */
 
+
+    function stRoundStart(){
+     //todo
+     //Select first player
+        $this->gamestate->nextState();
+    }
+
+    function stPlayerTurnStart(){
+        $this->gamestate->nextState();
+    }
+/*
+    function stPlayerTurn1(){
+     //todo
+     //Check active potion and apply
+     //Draw cards
+        $this->gamestate->nextState();
+    }
+*/
+    function stPlayerTurnEnd(){
+        //todo
+     //activate next player
+
+    }
+
+    function stRoundEnd(){
+     //todo
+     //check game end and move to next round
+     /*
+         if(gameend){
+              $this->gamestate->nextState("gameEnd");
+          } else {
+              $this->gamestate->nextstate("roundStart");
+          }
+          */
+    }
+
 //////////////////////////////////////////////////////////////////////////////
 //////////// Zombie
 ////////////
@@ -253,13 +545,13 @@ class magicshop extends Table
 
     function zombieTurn( $state, $active_player )
     {
-    	$statename = $state['name'];
-    	
+        $statename = $state['name'];
+        
         if ($state['type'] === "activeplayer") {
             switch ($statename) {
                 default:
                     $this->gamestate->nextState( "zombiePass" );
-                	break;
+                    break;
             }
 
             return;

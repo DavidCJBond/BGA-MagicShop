@@ -119,9 +119,11 @@ $machinestates = array(
 
     STATE_PLAYER_TURN_1 => array(
     	"name" => "playerTurn1",
-    	"description" => "",
-        "type" => "game",
-        "action" => "stPlayerTurn1",
+        "description" => clienttranslate('${actplayer} can draw new cards'),
+        "descriptionmyturn" => clienttranslate('${you} can draw new cards'),
+        "type" => "activeplayer",
+        //"action" => "stPlayerTurn1",
+        'possibleactions' => array('drawBasic', 'drawAdvanced', 'drawItem'),
     	"transitions" => array( "playerTurn2" => STATE_PLAYER_TURN_2 )
     ),
 
@@ -139,7 +141,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} may stock their shop'),
         "descriptionmyturn" => clienttranslate('${you} may stock your shop '),
         "type" => "activeplayer",
-        "possibleactions" => array( "makepotionitem", "pass" ),
+        "possibleactions" => array( "makePotionItem", "pass" ),
         "transitions" => array( "playerTurn4" => STATE_PLAYER_TURN_4 )
     ),
 

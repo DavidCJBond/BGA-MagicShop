@@ -67,20 +67,31 @@
     }
 */
 
-#playershops {
+.flex-container {
     display: flex;
     flex-wrap: wrap;
 }
 
-.playertable {
-    margin: 20px;
+.playerShopWrap {
+    padding: 20px;
 }
 
-.playertableshop{
+.playerShopName {
+    padding: 10px;
+    text-align: center;
+}
+
+.playerShop{
+    z-index: -1;
     width: 372px;
     height: 526px;
     background: url('img/shopboard.jpg');
 }
 
-
+.test{
+    z-index: 1;
+    width:20px;
+    height:20px;
+    background: url('img/game_icon.png');
+}
 

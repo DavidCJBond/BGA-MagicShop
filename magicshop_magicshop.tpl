@@ -11,24 +11,63 @@
 -->
 
 
-<div id="playershops">
-
-    <!-- BEGIN player -->
-    <div class="playertable whiteblock">
-        <div class="playertablename" style="color:#{PLAYER_COLOUR}">
-            {PLAYER_NAME}
+<div id="deckWrap" class="whiteblock">
+    <span id="basicPotionDeckWrap">
+        {BASIC_POTIONS}
+        <div id="basicPotionDeck">
         </div>
-        <div class="playertableshop" id="playertableshop_{PLAYER_ID}">
+    </span>
+    <span id="advancedPotionDeckWrap">
+        {ADVANCED_POTIONS}
+        <div id="advancedPotionDeck">
+        </div>
+    </span>
+    <span id="itemDeckWrap">
+        {ITEMS}
+        <div id="itemDeck">
+        </div>
+    </span>
+</div>
+
+<div id="itemDeckDisplay">
+    display item deck
+</div>
+
+
+
+
+<div id="playerShopsWrap" class="whiteblock flex-container">
+    <!-- BEGIN playerShops -->
+    <div class="playerShopWrap">
+        <div class="playerShopName" style="color:#{PLAYER_COLOUR}">
+            <b>{PLAYER_NAME}</b>
+        </div>
+        <div class="playerShop" id="playerShop_{PLAYER_ID}">
         </div>
     </div>
-    <!-- END player -->
-
+    <!-- END playerShops -->
 </div>
 
-<div id="myhand" class="whitespace">
+<span>
+<div class="playerShopWrap whiteblock">
+<!--	<div class="playerShopName" style="color:#{CURRENT_PLAYER_COLOUR}"> -->
+    <div class="playerShopName">
+	    <b>{CURRENT_PLAYER_SHOP}</b>
+    </div>
+	<div class="playerShop" id="playerShop_{CURRENT_PLAYER_ID}">
+	</div>
+	
 </div>
 
+<div id="playerhand">
+    <b>{CURRENT_PLAYER_HAND}</b>
+</div>
 
+<div id="myhand" class="whiteblock">
+</div>
+</span>
+<div id="tests">
+</div>
 <script type="text/javascript">
 
 // Javascript HTML templates
@@ -38,6 +77,8 @@
 var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
 
 */
+var jstpl_test = '<div id="test_${player}_${id}" class="test"></div>'
+
 
 </script>  
 
