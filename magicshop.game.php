@@ -372,13 +372,13 @@ class magicshop extends Table
         }
 
         //Notify the reciving player the cards received
-        self::notifyPlayer($player_id, 'cardDrawPersonal','', array(
+        self::notifyPlayer($player_id, 'drawCardsPersonal','', array(
             'cards' => $picked
         ) );
 
 
         // Notify all players that cards were drawn
-        self::notifyAllPlayers( 'cardDraw', clienttranslate( '${player_name} draws ${count} basic potions' ), array(
+        self::notifyAllPlayers( 'drawCards', clienttranslate( '${player_name} draws ${count} basic potions' ), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'type' => 'basic',
@@ -406,13 +406,13 @@ class magicshop extends Table
         }
 
         //Notify the reciving player the cards received
-        self::notifyPlayer($player_id, 'cardDrawPersonal','', array(
+        self::notifyPlayer($player_id, 'drawCardsPersonal','', array(
             'cards' => $picked
         ) );
 
 
         // Notify all players that cards were drawn
-        self::notifyAllPlayers( 'cardDraw', clienttranslate( '${player_name} draws ${count} advanced potion' ), array(
+        self::notifyAllPlayers( 'drawCards', clienttranslate( '${player_name} draws ${count} advanced potion' ), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'type' => 'advanced',
@@ -429,17 +429,33 @@ class magicshop extends Table
         $player_id = self::getActivePlayerId();
 
         $advancedCount = count($this->cardDeck->getCardsOfTypeInLocation( null, $type_arg=1, 'shop', $location_arg = $player_id ));
-        self::dump('actionDrawItem advanced count', $advancedCount);
+        
+        $item = $this->cardDeck->getCard($itemId);
 
-        if($advancedCount < 2){ //2 advanced cards
-            throw new BgaUserException(self::_("You can not draw items, you do not have enough advanced potions in your shop"));
-        }
+        // if($advancedCount < 2){ //2 advanced cards
+        //     throw new BgaUserException(self::_("You can not draw items, you do not have enough advanced potions in your shop"));
+        // }
 
-        if($this->cardDeck->getCard($itemId)['location'] != 'deckItem'){
-            throw new BgaUserException(self::_("You can not draw that item, it is not avalible in the deck"));
-        }
+        // if($this->cardDeck->getCard($itemId)['location'] != 'deckItem'){
+        //     throw new BgaUserException(self::_("You can not draw that item, it is not avalible in the deck"));
+        // }
 
         $this->cardDeck->moveCard($itemId, 'hand', $player_id);
+        
+        //Notify the reciving player the cards received
+        self::notifyPlayer($player_id, 'drawCardsPersonal','', array(
+            'cards' => array($item),
+        ) );
+
+
+        // Notify all players that cards were drawn
+        self::notifyAllPlayers( 'drawCards', clienttranslate( '${player_name} draws ${item_name} from the item deck' ), array(
+            'player_id' => $player_id,
+            'player_name' => self::getActivePlayerName(),
+            'type' => 'item',
+            'item_name' => $this->cards[$item['type']]['name'],
+            'count' => 1,
+        ) );
 
         $this->gamestate->nextstate();
      }

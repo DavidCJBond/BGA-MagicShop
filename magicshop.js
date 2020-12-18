@@ -445,6 +445,7 @@ define([
                 // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
                 // 
                 dojo.subscribe('drawCards', this, 'notif_drawCards');
+                dojo.subscribe('drawCardsPersonal', this, 'notif_drawCardsPersonal');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -469,6 +470,21 @@ define([
             //    notif.args.type
             //    notif.args.count
 
+            var src;
+            if(notif.args.type == 'basic'){
+                src = 'basicPotionDeck';
+            } else if (notif.args.type == 'advanced'){
+                src = 'advancedPotionDeck';
+            } else {
+                src = 'itemDeck';
+            }
+            var dest = 'player_board_' + notif.args.player_id;
+
+            //this.slideTemporaryObject( mobile_obj_html, mobile_obj_parent, from, to, duration, delay )
+            for(var i = 0; i < notif.args.count; ++i){
+                this.slideTemporaryObject('<div class="cardBack"></div>', src, src, dest, 500, 100 * i);
+            }
+            
            },
 
 
