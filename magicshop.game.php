@@ -292,6 +292,151 @@ class magicshop extends Table
      //set potion active
          $this->gamestate->nextstate("playerTurn3");
      }
+
+
+     function doBasicPotion(){
+
+     }
+
+     function doAdvancedPotion(){
+
+     }
+
+     function doItem(){
+
+     }
+
+     function doCard($type){
+        switch($type){
+            //Items
+            //Stone of Influence
+            case 0:{
+                break;
+            }
+            //Shield of Safety
+            case 1:{
+                break;
+            }
+            //Helmet of Preservation
+            case 2:{
+                break;
+            }
+            //Belt of Thievery
+            case 3:{
+                break;
+            }
+            //Statue of Wisdom
+            case 4:{
+                break;
+            }
+            //Necklace of Trades
+            case 5:{
+                break;
+            }
+            //Dagger of Light
+            case 6:{
+                break;
+            }
+            //Boots of Forthsight
+            case 7:{
+                break;
+            }
+            // Advanced Potions
+            //Production Liqueur
+            case 8:
+            case 9:{
+                break;
+            }
+            //Golden Water
+            case 10:
+            case 11:{
+                break;
+            }
+            //Spy Oil
+            case 12:
+            case 13:{
+                break;
+            }
+            //Thief Nectar
+            case 14:
+            case 15:{
+                break;
+            }
+            //Guardian Elixer
+            case 16:
+            case 17:{
+                break;
+            }
+            //Multiply Juice
+            case 18:
+            case 19:{
+                break;
+            }
+            //Sorcery Tonic
+            case 20:
+            case 21:{
+                break;
+            }
+            //Wisdom Wine
+            case 22:
+            case 23:{
+                break;
+            }
+            //Basic Potions
+            //Production Potion
+            case 24:
+            case 25:{
+                break;
+            }
+            //Gold Potion
+            case 26:
+            case 27:{
+                break;
+            }
+            //Spy Potion
+            case 28:
+            case 29:{
+                break;
+            }
+            //Thief Potion
+            case 30:
+            case 31:{
+                break;
+            }
+            //Guardian Potion
+            case 32:
+            case 33:{
+                break;
+            }
+            //Refresh Potion
+            case 34:
+            case 35:{
+                break;
+            }
+            //Supply Potion
+            case 36:
+            case 37:{
+                break;
+            }
+            //Knowledge Potion
+            case 38:
+            case 39:{
+                break;
+            }
+            //Double Potion
+            case 40:
+            case 41:{
+                break;
+            }
+            //Time Potion
+            case 42:
+            case 43:{
+                //todo
+                break;
+            }
+        }
+
+     }
      
      //target: id of card to create
      //sources: array of id's of cards to be used to pay for the card
@@ -432,13 +577,13 @@ class magicshop extends Table
         
         $item = $this->cardDeck->getCard($itemId);
 
-        // if($advancedCount < 2){ //2 advanced cards
-        //     throw new BgaUserException(self::_("You can not draw items, you do not have enough advanced potions in your shop"));
-        // }
+        if($advancedCount < 2){ //2 advanced cards
+            throw new BgaUserException(self::_("You can not draw items, you do not have enough advanced potions in your shop"));
+        }
 
-        // if($this->cardDeck->getCard($itemId)['location'] != 'deckItem'){
-        //     throw new BgaUserException(self::_("You can not draw that item, it is not avalible in the deck"));
-        // }
+        if($this->cardDeck->getCard($itemId)['location'] != 'deckItem'){
+            throw new BgaUserException(self::_("You can not draw that item, it is not avalible in the deck"));
+        }
 
         $this->cardDeck->moveCard($itemId, 'hand', $player_id);
         

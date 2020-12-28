@@ -443,7 +443,7 @@ $this->cards = array(
     ),
     34 => array(
         "type" => "basic",
-        "name" => clienttranslate("Refreshpotion "),
+        "name" => clienttranslate("Refreshpotion"),
         "count" => 6,
         "points" => 1,
         "costGold" => 1,
@@ -455,7 +455,7 @@ $this->cards = array(
     ),
     35 => array(
         "type" => "basic",
-        "name" => clienttranslate("Refreshpotion "),
+        "name" => clienttranslate("Refreshpotion"),
         "count" => 2,
         "points" => 1,
         "costGold" => 1,
@@ -467,7 +467,7 @@ $this->cards = array(
     ),
     36 => array(
         "type" => "basic",
-        "name" => clienttranslate("Supplypotion "),
+        "name" => clienttranslate("Supplypotion"),
         "count" => 6,
         "points" => 2,
         "costGold" => 2,
@@ -479,7 +479,7 @@ $this->cards = array(
     ),
     37 => array(
         "type" => "basic",
-        "name" => clienttranslate("Supplypotion "),
+        "name" => clienttranslate("Supplypotion"),
         "count" => 2,
         "points" => 2,
         "costGold" => 2,
@@ -491,7 +491,7 @@ $this->cards = array(
     ),
     38 => array(
         "type" => "basic",
-        "name" => clienttranslate("Knowledgepotion "),
+        "name" => clienttranslate("Knowledgepotion"),
         "count" => 6,
         "points" => 2,
         "costGold" => 2,
@@ -503,7 +503,7 @@ $this->cards = array(
     ),
     39 => array(
         "type" => "basic",
-        "name" => clienttranslate("Knowledgepotion "),
+        "name" => clienttranslate("Knowledgepotion"),
         "count" => 2,
         "points" => 2,
         "costGold" => 2,
@@ -515,7 +515,7 @@ $this->cards = array(
     ),
     40 => array(
         "type" => "basic",
-        "name" => clienttranslate("Doublepotion "),
+        "name" => clienttranslate("Doublepotion"),
         "count" => 6,
         "points" => 3,
         "costGold" => 3,
@@ -527,7 +527,7 @@ $this->cards = array(
     ),
     41 => array(
         "type" => "basic",
-        "name" => clienttranslate("Doublepotion "),
+        "name" => clienttranslate("Doublepotion"),
         "count" => 2,
         "points" => 3,
         "costGold" => 3,
@@ -539,7 +539,7 @@ $this->cards = array(
     ),
     42 => array(
         "type" => "basic",
-        "name" => clienttranslate("Timepotion "),
+        "name" => clienttranslate("Timepotion"),
         "count" => 6,
         "points" => 3,
         "costGold" => 3,
@@ -551,7 +551,7 @@ $this->cards = array(
     ),
     43 => array(
         "type" => "basic",
-        "name" => clienttranslate("Timepotion "),
+        "name" => clienttranslate("Timepotion"),
         "count" => 2,
         "points" => 3,
         "costGold" => 3,

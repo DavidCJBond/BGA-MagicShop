@@ -512,7 +512,9 @@ define([
             },
 
             notif_playCard: function(notif) {
-
+                //notif.args.cardId
+                //notif.args.shopJC
+                this.shopZones.placeInZone()
             }
 
         });
