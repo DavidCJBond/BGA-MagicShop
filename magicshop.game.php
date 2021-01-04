@@ -194,6 +194,9 @@ class magicshop extends Table
         // $result['hand'] = array_merge($handBasic, $handAdvanced, $handItem);
         $result['hand'] = $this->cardDeck->getCardsInLocation('hand', $current_player_id);
 
+        //player shops
+        $result['shops'] = $this->cardDeck->getCardsInLocation('shop');
+
         //item deck
         $result['deckItem'] = $this->cardDeck->getCardsInLocation('deckItem');
         
@@ -213,6 +216,7 @@ class magicshop extends Table
     function getGameProgression()
     {
         // TODO: compute and return the game progression
+        //max of players things in shop / number required for the player to win
 
         return 0;
     }

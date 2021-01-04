@@ -75,86 +75,33 @@ define([
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('myhand'), this.cardWidth, this.cardHeight);
                 this.playerHand.onItemCreate = dojo.hitch( this, 'setupNewCard' );
-
                 this.playerHand.image_items_per_row = 10;
+                this.playerHand.setSelectionMode(0);
                 for (var cardType in gamedatas.cardInfo) {
                     this.playerHand.addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);
                 }
-                // Cards in player's hand
-                /*
-                for (var cardId in gamedatas['handBasic']) {
-                    var card = gamedatas['handBasic'][cardId];
-                    this.playerHand.addToStockWithId(card.type, this.basicTypeId + card.id);
-                }
-                for (var cardId in gamedatas['handAdvanced']) {
-                    var card = gamedatas['handAdvanced'][cardId];
-                    this.playerHand.addToStockWithId(card.type, this.advancedTypeId + card.id);
-                }
-                for (var cardId in gamedatas['handItem']) {
-                    var card = gamedatas['handItem'][cardId];
-                    this.playerHand.addToStockWithId(card.type, this.itemTypeId + card.id);
-                }
-                */
+
                 for(var cardId in gamedatas['hand']){
                     var card = gamedatas['hand'][cardId];
                     this.playerHand.addToStockWithId(card.type, card.id);
                 }
 
-
-                //setup shop zone
-                this.shopZones = {};
+                //setup shop stocks
+                this.shopStocks = {};
                 for (var player_id in gamedatas.players) {
-                    this.shopZones[player_id] = new ebg.zone();
-                    this.shopZones[player_id].create(this, 'playerShop_' + player_id, this.cardWidth, this.cardHeight);
-                    //custom does not exist
-                    //this.shopZones[player_id].setPattern('custom');
-                    this.shopZones[player_id].autoheight = false;
-                    this.shopZones[player_id].itemIdToCoords = function(i) {
-                        if (i == 0) {
-                            return { x: 10, y: 195, w: 372, h: 156 };
-                        } else if (i == 1) {
-                            return { x: 130, y: 195, w: 372, h: 156 };
-                        } else if (i == 2) {
-                            return { x: 250, y: 195, w: 372, h: 156 };
-                        } else if (i == 3) {
-                            return { x: 10, y: 360, w: 372, h: 156 };
-                        } else if (i == 4) {
-                            return { x: 130, y: 360, w: 372, h: 156 };
-                        } else {//if (i == 5) {
-                            return { x: 250, y: 360, w: 372, h: 156 };
-                        }
+                    this.shopStocks[player_id] = new ebg.stock();
+                    this.shopStocks[player_id].create(this, 'playerShop_' + player_id, this.cardWidth, this.cardHeight);
+                    this.shopStocks[player_id].onItemCreate = dojo.hitch( this, 'setupNewCard' );
+                    this.shopStocks[player_id].image_items_per_row = 10;
+                    this.shopStocks[player_id].setSelectionMode(0);
+                    for (var cardType in gamedatas.cardInfo) {
+                        this.shopStocks[player_id].addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);
                     }
-
-                    //test
-                    for (var i = 0; i < 6; ++i) {
-                        dojo.place(this.format_block('jstpl_test', {
-                            player: player_id,
-                            id: i
-                        }), 'tests');
-                        this.shopZones[player_id].placeInZone('test_' + player_id + '_' + i);
-                    }
+                    
                 }
-                this.shopZonesJC = {};
-                for (var player_id in gamedatas.players) {
-                    this.shopZonesJC[player_id] = new ebg.zone();
-                    this.shopZonesJC[player_id].create(this, 'playerShop_' + player_id, this.cardWidth, this.cardHeight);
-                    //custom does not exist
-                    //this.shopZonesJC[player_id].setPattern('custom');
-                    this.shopZonesJC[player_id].autoheight = false;
-                    this.shopZonesJC[player_id].itemIdToCoords = function(i) {
-                        if (i == 0) {
-                            return { x: 130, y: 30, w: 372, h: 156 };
-                        } else {
-                            return { x: 250, y: 30, w: 372, h: 156 };
-                        }
-                    }
-                    //test
-                    for (var i = 0; i < 2; ++i) {
-                        dojo.place(this.format_block('jstpl_test', {
-                            player: player_id,
-                            id: i+'jc'
-                        }), 'tests');
-                        this.shopZonesJC[player_id].placeInZone('test_' + player_id + '_' + i+'jc');
+                for(var player_id in gamedatas['shops']){
+                    for(var i in gamedatas['shops'][player_id]){
+                        this.shopStocks[player_id].addToStockWithId(gamedatas['shops'][player_id][i].type,gamedatas['shops'][player_id][i].id);
                     }
                 }
 
@@ -162,8 +109,8 @@ define([
                 this.stockItemDisplay = new ebg.stock();
                 this.stockItemDisplay.create(this, $('itemDeckDisplay'), this.cardWidth, this.cardHeight);
                 this.stockItemDisplay.onItemCreate = dojo.hitch( this, 'setupNewCard' );
-
                 this.stockItemDisplay.image_items_per_row = 10;
+                this.stockItemDisplay.setSelectionMode(0);
                 for (var cardType in gamedatas.cardInfo) {
                     if(gamedatas.cardInfo[cardType]['type'] == 'item'){
                         this.stockItemDisplay.addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);

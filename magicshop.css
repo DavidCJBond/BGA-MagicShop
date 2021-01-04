@@ -81,12 +81,6 @@
     text-align: center;
 }
 
-.playerShop{
-    z-index: -1;
-    width: 372px;
-    height: 526px;
-    background: url('img/shopboard.jpg');
-}
 
 .cardBack {
     width: 103px;

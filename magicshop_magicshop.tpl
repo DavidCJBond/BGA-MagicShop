@@ -44,7 +44,7 @@
         <div class="playerShopName" style="color:#{PLAYER_COLOUR}">
             <b>{PLAYER_NAME}</b>
         </div>
-        <div class="playerShop" id="playerShop_{PLAYER_ID}">
+        <div id="playerShop_{PLAYER_ID}">
         </div>
     </div>
     <!-- END playerShops -->
@@ -56,7 +56,7 @@
     <div class="playerShopName">
 	    <b>{CURRENT_PLAYER_SHOP}</b>
     </div>
-	<div class="playerShop" id="playerShop_{CURRENT_PLAYER_ID}">
+	<div id="playerShop_{CURRENT_PLAYER_ID}">
 	</div>
 	
 </div>
