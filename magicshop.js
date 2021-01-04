@@ -100,8 +100,11 @@ define([
                     
                 }
                 for(var player_id in gamedatas['shops']){
-                    for(var i in gamedatas['shops'][player_id]){
-                        this.shopStocks[player_id].addToStockWithId(gamedatas['shops'][player_id][i].type,gamedatas['shops'][player_id][i].id);
+                    // for(var i in gamedatas['shops'][player_id]){
+                    //     this.shopStocks[player_id].addToStockWithId(gamedatas['shops'][player_id][i].type,gamedatas['shops'][player_id][i].id);
+                    // }
+                    for(var card of gamedatas['shops'][player_id]){
+                        this.shopStocks[player_id].addToStockWithId(card.type,card.id);
                     }
                 }
 
@@ -246,24 +249,7 @@ define([
                 this.addTooltip(card_div.id, this.gamedatas['cardInfo'][card_type_id]['effectDescription'], '');
             },
 
-            /*
-                Id conversion
-                +0 basic
-                +1 advanced
-                +2 item
-            */
-            idToCombo: function(id, typeId){
-                var typeOffset = 0; //basic
-                if(this.gamedatas.cardInfo[typeId]['type'] == 'advanced'){
-                    typeOffset = 1;
-                } else if (this.gamedatas.cardInfo[typeId]['type'] == 'item'){
-                    typeOffset = 2;
-                }
-                id *= 3;
-                id += typeOffset;
-                return id;
-            },
-
+            
             ///////////////////////////////////////////////////
             //// Player's action
 
@@ -393,6 +379,7 @@ define([
                 // 
                 dojo.subscribe('drawCards', this, 'notif_drawCards');
                 dojo.subscribe('drawCardsPersonal', this, 'notif_drawCardsPersonal');
+                dojo.subscribe('makePotionItem', this, 'notif_makePotionItem');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -462,6 +449,33 @@ define([
                 //notif.args.cardId
                 //notif.args.shopJC
                 this.shopZones.placeInZone()
+            },
+
+            notif_makePotionItem: function(notif){
+                // 'player_id' => $player_id,
+                // 'player_name' => self::getActivePlayerName(),
+                // 'targetId' => $targetId,
+                // 'item_name' => $this->cards[$target]['name'],
+                // 'sourceIds' => $sourceIds,
+                // 'targetType'
+                if(notif.args.player_id == this.player_id){
+                    //move created card
+                    this.shopStocks[notif.args.player_id].addToStockWithId(notif.args.targetType, notif.args.targetId, this.playerHand.getItemDivId(targetId));
+                    this.playerHand.removeFromStockById(targetId);
+
+                    //remove spent cards
+                    for(var id of notif.args.sourceIds){
+                        this.playerHand.removeFromStockById(id, null, true);
+                    }
+                    this.playerHand.updateDisplay();
+                } else {
+                    this.shopStocks[notif.args.player_id].addToStockWithId(notif.args.targetType, notif.args.targetId, 'player_board_' + notif.args.player_id);
+                    // for(var i = 0; i < notif.args.sourceIds.length; ++i){
+                    //     this.slideTemporaryObject('<div class="cardBack"></div>', src, src, dest, 500, 100 * i);
+                    // }
+                }
+                
+                
             }
 
         });

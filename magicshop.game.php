@@ -230,32 +230,25 @@ class magicshop extends Table
         In this space, you can put any utility methods useful for your game logic
     */
     
-    /*
-        Id conversion
-        +0 basic
-        +1 advanced
-        +2 item
-    */
-    function comboToId($id){
-        $typeOffset = $id % 3;
-        $id -= $typeOffset;
-        $id /= 3;
-        if($typeOffset == 0){
-            $type = 'basic';
-        } elseif ($typeOffset == 1){
-            $type = 'advanced';
-        } elseif ($typeOffset == 2){
-            $type = 'item';
+
+    function discardCard($id){
+        $type_arg = $this->cardDeck->getCard($id)['type_arg'];
+        if($type_arg == 0){
+            $this->cardDeck->moveCard($id, 'discardBasic');
+        } elseif ($type_arg == 1){
+            $this->cardDeck->moveCard($id, 'discardAdvanced');
+        } elseif ($type_arg == 2){
+            $this->cardDeck->moveCard($id, 'deckItem');
+        } else {
+            throw new BgaVisibleSystemException ('Error in card discard');
         }
-        return array('id' => $id, 'type' => $type);
     }
 
-    function idToCombo($id, $type){
-        $id *= 3;
-        $id += $type;
-        return $id;
+    function discardCards($idArray){
+        foreach($idArray as $value){
+            $this->discardCard($value);
+        }
     }
-
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
 //////////// 
@@ -441,15 +434,15 @@ class magicshop extends Table
         }
 
      }
-     
+
+     //stock shop with potion or item from hand
      //target: id of card to create
      //sources: array of id's of cards to be used to pay for the card
      function makePotionItem($targetId, $sourceIds) {
-     //todo
-     //stock shop with potion or item from hand
         self::checkAction('makePotionItem');
+        $player_id = self::getActivePlayerId();
         //add cost, subtract resources, check each ingredient for <= 0
-
+        $target = $this->cardDeck->getCard($targetId)['type'];
         if(!isset($this->cards[$target])){
             throw new BgaVisibleSystemException ( self::_("An error has occured (Error A3a) please refresh your page") );
         }
@@ -459,7 +452,8 @@ class magicshop extends Table
             $costRes[$res]++;
         }
         
-        foreach($sources as $source){
+        foreach($sourceIds as $sourceId){
+            $source = $this->cardDeck->getCard($sourceId)['type'];
             if(!isset($this->cards[$source])){
                 throw new BgaVisibleSystemException ( self::_("An error has occured (Error A3b) please refresh your page") );
             }
@@ -483,18 +477,21 @@ class magicshop extends Table
         //if all checks out perform the action
         if($paidRes || $costGold <= 0){
             //move target to shop
-
+            $this->cardDeck->moveCard($targetId, 'shops', $player_id);
             //discard resources from hand
-
+            $this->discardCards($sourceIds);
+            //notify players
+            self::notifyAllPlayers('makePotionItem', clienttranslate( '${player_name} creates ${item_name}', array(
+                'player_id' => $player_id,
+                'player_name' => self::getActivePlayerName(),
+                'targetId' => $targetId,
+                'targetType' => $target,
+                'item_name' => $this->cards[$target]['name'],
+                'sourceIds' => $sourceIds,
+            ));
         }
 
-
-        
-
-
-
-         $this->gamestate->nextstate();
-     
+        $this->gamestate->nextstate();
      }
      
      function pass() {
