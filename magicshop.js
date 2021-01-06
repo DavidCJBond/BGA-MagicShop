@@ -76,6 +76,7 @@ define([
                 this.playerHand.create(this, $('myhand'), this.cardWidth, this.cardHeight);
                 this.playerHand.onItemCreate = dojo.hitch( this, 'setupNewCard' );
                 this.playerHand.image_items_per_row = 10;
+                this.playerHand.extraClasses = 'card';
                 this.playerHand.setSelectionMode(0);
                 for (var cardType in gamedatas.cardInfo) {
                     this.playerHand.addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);
@@ -93,6 +94,7 @@ define([
                     this.shopStocks[player_id].create(this, 'playerShop_' + player_id, this.cardWidth, this.cardHeight);
                     this.shopStocks[player_id].onItemCreate = dojo.hitch( this, 'setupNewCard' );
                     this.shopStocks[player_id].image_items_per_row = 10;
+                    this.shopStocks[player_id].extraClasses = 'card';
                     this.shopStocks[player_id].setSelectionMode(0);
                     for (var cardType in gamedatas.cardInfo) {
                         this.shopStocks[player_id].addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);
@@ -113,6 +115,7 @@ define([
                 this.stockItemDisplay.create(this, $('itemDeckDisplay'), this.cardWidth, this.cardHeight);
                 this.stockItemDisplay.onItemCreate = dojo.hitch( this, 'setupNewCard' );
                 this.stockItemDisplay.image_items_per_row = 10;
+                this.stockItemDisplay.extraClasses = 'card';
                 this.stockItemDisplay.setSelectionMode(0);
                 for (var cardType in gamedatas.cardInfo) {
                     if(gamedatas.cardInfo[cardType]['type'] == 'item'){
@@ -143,6 +146,7 @@ define([
                 console.log('Entering state: ' + stateName);
 
                 switch (stateName) {
+
 
                     /* Example:
             
@@ -427,7 +431,7 @@ define([
                 // Cards in player's hand
                 for (var cardId in notif.args.cards) {
                     var card = notif.args.cards[cardId];
-                    var type = this.gamedatas.cards[card['type']];
+                    var type = this.gamedatas.cardInfo[card['type']];
                     if (type == 'basic') {
                         //cardId += this.basicTypeId;
                         this.playerHand.addToStockWithId(card.type, cardId, 'basicPotionDeck');

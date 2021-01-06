@@ -72,6 +72,17 @@
     flex-wrap: wrap;
 }
 
+.deckWrap{
+    margin:5px;
+    text-align: center;
+}
+
+.classActivePotionWrap{
+    border-style: ridge;
+    padding: 5px;
+}
+
+
 .playerShopWrap {
     padding: 20px;
 }
@@ -81,12 +92,17 @@
     text-align: center;
 }
 
-
-.cardBack {
+.card {
     width: 103px;
     height: 156px;
+    border-radius: 10px;
+    border: 1px solid hsl(0,0%,40%);
+    box-shadow: 3px 3px 3px rgba(0,0,0,0.4);
+}
+
+.cardBack {
     background: url('img/spritesheet.jpg');
-    background-position: 0px, -156px;
+    background-position: 0px -156px;
 }
 
 .test{

@@ -11,24 +11,24 @@
 -->
 
 
-<div id="deckWrap" class="whiteblock">
-    <span id="basicPotionDeckWrap">
+<div class="whiteblock flex-container">
+    <div class="deckWrap">
         <div>
             {BASIC_POTIONS}
         </div>
-        <div id="basicPotionDeck" class="cardBack">
+        <div id="basicPotionDeck" class="card cardBack" style="margin:auto">
         </div>
-    </span>
-    <span id="advancedPotionDeckWrap">
+    </div>
+    <div class="deckWrap">
         {ADVANCED_POTIONS}
-        <div id="advancedPotionDeck" class="cardBack">
+        <div id="advancedPotionDeck" class="card cardBack" style="margin:auto">
         </div>
-    </span>
-    <span id="itemDeckWrap">
+    </div>
+    <div class="deckWrap">
         {ITEMS}
-        <div id="itemDeck" class="cardBack">
+        <div id="itemDeck" class="card cardBack" style="margin:auto">
         </div>
-    </span>
+    </div>
 </div>
 
 <div id="itemDeckDisplay">
@@ -44,7 +44,14 @@
         <div class="playerShopName" style="color:#{PLAYER_COLOUR}">
             <b>{PLAYER_NAME}</b>
         </div>
-        <div id="playerShop_{PLAYER_ID}">
+        <div class="flex-container">
+            <div id="activePotionWrap_{PLAYER_ID}" class="classActivePotionWrap">
+                Active Potion
+                <div id="activePotion_{PLAYER_ID}" class="card">
+                </div>
+            </div>
+            <div id="playerShop_{PLAYER_ID}">
+            </div>
         </div>
     </div>
     <!-- END playerShops -->

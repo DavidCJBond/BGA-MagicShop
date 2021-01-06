@@ -481,7 +481,7 @@ class magicshop extends Table
             //discard resources from hand
             $this->discardCards($sourceIds);
             //notify players
-            self::notifyAllPlayers('makePotionItem', clienttranslate( '${player_name} creates ${item_name}', array(
+            self::notifyAllPlayers('makePotionItem', clienttranslate('${player_name} creates ${item_name}'), array(
                 'player_id' => $player_id,
                 'player_name' => self::getActivePlayerName(),
                 'targetId' => $targetId,
