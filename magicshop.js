@@ -78,6 +78,8 @@ define([
                 this.playerHand.image_items_per_row = 10;
                 this.playerHand.extraClasses = 'card';
                 this.playerHand.setSelectionMode(0);
+                this.playerHand.setSelectionAppearance('class');
+                dojo.connect( this.playerHand, 'onChangeSelection', this, 'onChangeSelectionHand' );
                 for (var cardType in gamedatas.cardInfo) {
                     this.playerHand.addItemType(cardType, cardType, g_gamethemeurl + 'img/spritesheet.jpg', gamedatas.cardInfo[cardType]['image']);
                 }
@@ -144,23 +146,24 @@ define([
             //
             onEnteringState: function(stateName, args) {
                 console.log('Entering state: ' + stateName);
+                if (this.isCurrentPlayerActive()) {
+                    switch (stateName) {
 
-                switch (stateName) {
 
-
-                    /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
+                        /* Example:
                 
-                break;
-           */
-
-
-                    case 'dummmy':
+                        case 'myGameState':
+                    
+                        // Show some HTML block at this game state
+                        dojo.style( 'my_html_block_id', 'display', 'block' );
+                        
                         break;
+                        */
+                        case 'playerTurn3':{
+                            this.playerHand.setSelectionMode(1);
+                            break;
+                        }
+                    }
                 }
             },
 
@@ -169,23 +172,23 @@ define([
             //
             onLeavingState: function(stateName) {
                 console.log('Leaving state: ' + stateName);
-
-                switch (stateName) {
-
-                    /* Example:
-            
-            case 'myGameState':
-            
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
                 
-                break;
-           */
+                    switch (stateName) {
 
+                        /* Example:
+                
+                case 'myGameState':
+                
+                    // Hide the HTML block we are displaying only during this game state
+                    dojo.style( 'my_html_block_id', 'display', 'none' );
+                    
+                    break;
+                        */
 
                     case 'dummmy':
                         break;
-                }
+                                    
+                    }
             },
 
             // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -217,8 +220,7 @@ define([
                             this.addActionButton('buttonDrawItem', _('Select 1 item to draw'), 'onActionDrawItem');
                            }
                            break;
-
-                       }
+                        }
                         case 'playerTurn2':
                             {
                                 this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
@@ -251,6 +253,24 @@ define([
 
             setupNewCard: function(card_div, card_type_id, card_id) {
                 this.addTooltip(card_div.id, this.gamedatas['cardInfo'][card_type_id]['effectDescription'], '');
+            },
+
+            onChangeSelectionHand: function( control_name, item_id )
+            {
+                console.log('onChangeSelectionHand id:' + item_id);
+                
+                dojo.destroy('buttonMakeHandCard');
+                this.makeHandCardSelected = item_id;
+                if(item_id != null) {
+                    var card = this.playerHand.getItemById(item_id);
+                    var cardName = this.gamedatas.cardInfo[card.type].name;
+                    this.addActionButton('buttonMakeHandCard',_('Make ') + cardName, 'onButtonMakeHandCard');
+                }
+            },
+
+            onButtonMakeHandCard: function(evt){
+                console.log('onButtonMakeHandCard');
+                dojo.stopEvent(evt);
             },
 
             
