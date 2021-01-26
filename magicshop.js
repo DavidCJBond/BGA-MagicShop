@@ -93,7 +93,7 @@ define([
                 this.shopStocks = {};
                 for (var player_id in gamedatas.players) {
                     this.shopStocks[player_id] = new ebg.stock();
-                    this.shopStocks[player_id].create(this, 'playerShop_' + player_id, this.cardWidth, this.cardHeight);
+                    this.shopStocks[player_id].create(this, $('playerShop_' + player_id), this.cardWidth, this.cardHeight);
                     this.shopStocks[player_id].onItemCreate = dojo.hitch( this, 'setupNewCard' );
                     this.shopStocks[player_id].image_items_per_row = 10;
                     this.shopStocks[player_id].extraClasses = 'card';
@@ -148,19 +148,12 @@ define([
                 console.log('Entering state: ' + stateName);
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
-
-
-                        /* Example:
-                
-                        case 'myGameState':
-                    
-                        // Show some HTML block at this game state
-                        dojo.style( 'my_html_block_id', 'display', 'block' );
-                        
-                        break;
-                        */
                         case 'playerTurn3':{
                             this.playerHand.setSelectionMode(1);
+                            break;
+                        }
+                        case 'client_makeCardResources': {
+                            this.playerHand.setSelectionMode(2);
                             break;
                         }
                     }
@@ -173,22 +166,16 @@ define([
             onLeavingState: function(stateName) {
                 console.log('Leaving state: ' + stateName);
                 
-                    switch (stateName) {
-
-                        /* Example:
-                
-                case 'myGameState':
-                
-                    // Hide the HTML block we are displaying only during this game state
-                    dojo.style( 'my_html_block_id', 'display', 'none' );
-                    
-                    break;
-                        */
-
-                    case 'dummmy':
+                switch (stateName) {
+                    case 'playerTurn3': {
+                        this.playerHand.unselectAll();
                         break;
-                                    
                     }
+                    case 'client_makeCardResources' : {
+                        this.playerHand.unselectAll();
+                        break;
+                    }
+                }
             },
 
             // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -199,18 +186,6 @@ define([
 
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
-                        /*               
-                                         Example:
-                         
-                                         case 'myGameState':
-                                            
-                                            // Add 3 action buttons in the action status bar:
-                                            
-                                            this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                                            this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                                            this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
-                                            break;
-                        */
                        case 'playerTurn1':{
                            this.addActionButton('buttonDrawBasic', _('Draw 2 basic potions'), 'onActionDrawBasic');
                            if(true){//if shop contains enough potions
@@ -221,22 +196,22 @@ define([
                            }
                            break;
                         }
-                        case 'playerTurn2':
-                            {
-                                this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
-                                break;
-                            }
-                        case 'playerTurn3':
-                            {
-                                this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
-                                break;
-                            }
-                        case 'playerTurn4':
-                            {
-                                this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
-                                break;
-                            }
-
+                        case 'playerTurn2': {
+                            this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
+                            break;
+                        }
+                        case 'playerTurn3': {
+                            this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
+                            break;
+                        }
+                        case 'client_makeCardResources': {
+                            this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
+                            break;
+                        }
+                        case 'playerTurn4': {
+                            this.addActionButton('buttonActionPass', _('Pass'), 'onActionPass');
+                            break;
+                        }
                     }
                 }
             },
@@ -258,19 +233,45 @@ define([
             onChangeSelectionHand: function( control_name, item_id )
             {
                 console.log('onChangeSelectionHand id:' + item_id);
-                
-                dojo.destroy('buttonMakeHandCard');
-                this.makeHandCardSelected = item_id;
-                if(item_id != null) {
-                    var card = this.playerHand.getItemById(item_id);
-                    var cardName = this.gamedatas.cardInfo[card.type].name;
-                    this.addActionButton('buttonMakeHandCard',_('Make ') + cardName, 'onButtonMakeHandCard');
+                if(this.gamedatas.gamestate.name == 'playerTurn3'){
+                    dojo.destroy('buttonMakeCard');
+                    //this.makeCard = null;
+                    if(item_id != null && this.playerHand.isSelected(item_id)) {
+                        this.makeCard = item_id;
+                        var card = this.playerHand.getItemById(item_id);
+                        var cardName = this.gamedatas.cardInfo[card.type].name;
+                        this.addActionButton('buttonMakeCard',_('Make ') + cardName, 'onButtonMakeCard');
+                    }
+                } else if (this.gamedatas.gamestate.name == 'client_makeCardResources'){
+                    dojo.destroy('buttonMakeCardRes');
+                    this.makeCardRes = [];
+                    if(this.playerHand.isSelected(this.makeCard)){
+                       this.playerHand.unselectItem(this.makeCard);
+                    }
+                    var selected = this.playerHand.getSelectedItems();
+                    for(card of selected){
+                        this.makeCardRes.push(card.id);
+                    }
+                    this.addActionButton('buttonMakeCardRes', _('Use selected resources'), 'onButtonMakeCardRes');
                 }
             },
 
-            onButtonMakeHandCard: function(evt){
-                console.log('onButtonMakeHandCard');
+            onButtonMakeCard: function(evt){
+                console.log('onButtonMakeCard target: ' + this.makeCard);
                 dojo.stopEvent(evt);
+                this.setClientState("client_makeCardResources", {
+                    descriptionmyturn : "Please select the cards you would like to spend",
+                });
+            },
+
+            onButtonMakeCardRes: function(evt){
+                console.log('onButtonMakeCardRes target: ' + this.makeCard + ', sources: ' + this.makeCardRes);
+                dojo.stopEvent(evt);
+                this.ajaxcall('/magicshop/magicshop/actionMake.html', { 
+                    lock: true,
+                    target: this.makeCard,
+                    sources: this.makeCardRes.toString()
+                }, this, function(result) {}, function(is_error) {});
             },
 
             
@@ -483,13 +484,14 @@ define([
                 // 'sourceIds' => $sourceIds,
                 // 'targetType'
                 if(notif.args.player_id == this.player_id){
+                    console.log('notif_makePotionItem args: target: ' + notif.args.targetId + ' sourceids: ' + notif.args.sourceIds);
                     //move created card
-                    this.shopStocks[notif.args.player_id].addToStockWithId(notif.args.targetType, notif.args.targetId, this.playerHand.getItemDivId(targetId));
-                    this.playerHand.removeFromStockById(targetId);
+                    this.shopStocks[notif.args.player_id].addToStockWithId(notif.args.targetType, notif.args.targetId, this.playerHand.getItemDivId(notif.args.targetId));
+                    this.playerHand.removeFromStockById(notif.args.targetId);
 
                     //remove spent cards
                     for(var id of notif.args.sourceIds){
-                        this.playerHand.removeFromStockById(id, null, true);
+                        this.playerHand.removeFromStockById(id, undefined, true);
                     }
                     this.playerHand.updateDisplay();
                 } else {

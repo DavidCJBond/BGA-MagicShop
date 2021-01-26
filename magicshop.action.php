@@ -74,12 +74,13 @@ class action_magicshop extends APP_GameAction
 
     $arg1 = self::getArg('target', AT_posint, true);
     $arg2Raw = self::getArg('sources', AT_numberlist, true);
-    $arg2Raw = trim($card_ids_raw);
+    $arg2Raw = trim($arg2Raw);
 
     if ($arg2Raw == '') {
       $arg2 = array();
     } else {
-      $arg2 = explode(' ', $arg2Raw);
+      $arg2 = explode(',', $arg2Raw);
+      $arg2 = array_map('intval', $arg2);
     }
 
     $this->game->makePotionItem($arg1, $arg2);

@@ -439,6 +439,8 @@ class magicshop extends Table
      //target: id of card to create
      //sources: array of id's of cards to be used to pay for the card
      function makePotionItem($targetId, $sourceIds) {
+        //var_dump('makePotionItem',$targetId,$sourceIds);
+        //$sourceIds = array(1,2,3);
         self::checkAction('makePotionItem');
         $player_id = self::getActivePlayerId();
         //add cost, subtract resources, check each ingredient for <= 0
@@ -452,7 +454,10 @@ class magicshop extends Table
             $costRes[$res]++;
         }
         
-        foreach($sourceIds as $sourceId){
+        foreach($sourceIds as $key => $sourceId){
+            if($targetId == $sourceId){
+                throw new BgaUserException(self::_("You can not use the card being made as a resource"));
+            }
             $source = $this->cardDeck->getCard($sourceId)['type'];
             if(!isset($this->cards[$source])){
                 throw new BgaVisibleSystemException ( self::_("An error has occured (Error A3b) please refresh your page") );
@@ -461,7 +466,7 @@ class magicshop extends Table
                 foreach($this->cards[$source]['valueIngredients'] as $res){
                     $costRes[$res]--;
                 }
-            } else {
+            } else if($this->cards[$source]['valueType'] == 'coin'){
                 $costGold -= $this->cards[$source]['valueIngredients'];
             }
         }
