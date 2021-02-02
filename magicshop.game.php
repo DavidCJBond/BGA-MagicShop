@@ -304,6 +304,7 @@ class magicshop extends Table
      }
 
      function doCard($type){
+
         switch($type){
             //Items
             //Stone of Influence
@@ -415,14 +416,25 @@ class magicshop extends Table
             case 37:{
                 break;
             }
-            //Knowledge Potion
+            //Wisdom Potion
             case 38:
             case 39:{
+                draw 2 advanced
+                notify all cards drawn
+                notify player of cards
                 break;
             }
-            //Double Potion
+            //Doubling Potion
             case 40:
             case 41:{
+                draw 2 simple
+                notify all cards were drawn
+                notify player of cards
+                for each drawn
+                if(card type == 40 or card type == 41){
+                    discard drawn card
+                    notify all card discarded
+                }
                 break;
             }
             //Time Potion
