@@ -154,7 +154,7 @@ class magicshop extends Table
             $cards = $this->cardDeck->pickCards( 3, 'deckBasic', $player_id );
            
             // Notify player about his cards
-            self::notifyPlayer( $player_id, 'drawCards', '', array( 
+            self::notifyPlayer( $player_id, 'drawCardsPersonal', '', array( 
                 'cards' => $cards
             ) );
         }
@@ -303,8 +303,16 @@ class magicshop extends Table
 
      }
 
-     function doCard($type){
-
+     function doCard($id){
+        $type = $this->cardDeck->getCard($id)['type'];
+        $player_id = self::getCurrentPlayerId();
+        $player_name = self::getActivePlayerName();
+        //notify all players card activated
+        self::notifyAllPlayers('cardActivated', clienttranslate('${player_name} activates ${card_name}'), array(
+            'player_name' => $player_name,
+            'card_name' => $this->cards[$type]->name,
+            'card_id' => $id,
+        ));
         switch($type){
             //Items
             //Stone of Influence
@@ -366,13 +374,38 @@ class magicshop extends Table
                 break;
             }
             //Multiply Juice
+            //In phase 1 of the next round, you may draw three times the amount of Potion Cards you normaly draw. Or 2 Item Cards. 
             case 18:
             case 19:{
                 break;
             }
             //Sorcery Tonic
+            //Draw an item card at random and add it to your shop
             case 20:
             case 21:{
+                $this->cardDeck->shuffle('deckItem');
+                $drawn = $this->cardDeck->pickCardForLocation('deckItem', 'shop', $player_id );
+                //notify
+                // notify all cards drawn
+                self::notifyAllPlayers('drawCardsPublic', clienttranslate('${player_name} draws 1 item card'), array(
+                    'player_name' => $player_name,
+                    'player_id' =>  $player_id,
+                    'type' => 'item',
+                    'count' => 1,
+                ));
+                // notify player of cards
+                self::notifyPlayer($player_id, 'drawCardsPrivate', '', array(
+                    'cards' => array($drawn),
+                ));
+                //notify of make
+                self::notifyAllPlayers('makePotionItem', clienttranslate('${player_name} adds ${item_name} to their shop'), array(
+                    'player_id' => $player_id,
+                    'player_name' => self::getActivePlayerName(),
+                    'targetId' => $drawn->id,
+                    'targetType' => $drawn->type,
+                    'item_name' => $this->cards[$drawn->type]['name'],
+                    'sourceIds' => array(),
+                ));
                 break;
             }
             //Wisdom Wine
@@ -412,32 +445,75 @@ class magicshop extends Table
                 break;
             }
             //Supply Potion
+            //Immediately draw 5 simple potion cards and put them in your Book of Knowledge.
             case 36:
             case 37:{
+                // draw 2 simple
+                $drawn = $this->cardDeck->pickCards(5, 'deckBasic', $player_id);
+                // notify all cards drawn
+                self::notifyAllPlayers('drawCardsPublic', clienttranslate('${player_name} draws ${count} advanced potions'), array(
+                    'player_name' => $player_name,
+                    'player_id' =>  $player_id,
+                    'type' => 'basic',
+                    'count' => count($drawn),
+                ));
+                // notify player of cards
+                self::notifyPlayer($player_id, 'drawCardsPrivate', '', array(
+                    'cards' => $drawn,
+                ));
                 break;
             }
             //Wisdom Potion
+            //Draw 2 advanced Potion Cards and put them in your Book of Knowledge -even if you have less than 3 potions in your shop.
             case 38:
             case 39:{
-                draw 2 advanced
-                notify all cards drawn
-                notify player of cards
+                // draw 2 advanced
+                $drawn = $this->cardDeck->pickCards(2, 'deckAdvanced', $player_id);
+                // notify all cards drawn
+                self::notifyAllPlayers($player_id, 'drawCardsPublic', clienttranslate('${player_name} draws ${count} advanced potions'), array(
+                    'player_name' => $player_name,
+                    'player_id' =>  $player_id,
+                    'type' => 'advanced',
+                    'count' => count($drawn),
+                ));
+                // notify player of cards
+                self::notifyPlayer('drawCardsPrivate', '', array(
+                    'cards' => $drawn,
+                ));
                 break;
             }
             //Doubling Potion
+            //Draw 2 simple potion cards and add them to your shop. If you draw another doubling potion, discard it
             case 40:
             case 41:{
-                draw 2 simple
-                notify all cards were drawn
-                notify player of cards
-                for each drawn
-                if(card type == 40 or card type == 41){
-                    discard drawn card
-                    notify all card discarded
+                // draw 2 simple
+                $drawn = $this->cardDeck->pickCards(2, 'deckBasic', $player_id);
+                //notify draw 2
+                self::notifyAllPlayers('drawCardsPublic', clienttranslate('${player_name} draws ${count} simple potions'), array(
+                    'player_name' => $player_name,
+                    'player_id' =>  $player_id,
+                    'type' => 'basic',
+                    'count' => count($drawn),
+                ));
+                self::notifyPlayer($player_id, 'drawCardsPrivate', '', array(
+                    'cards' => $drawn,
+                ));
+                foreach($drawn as $cardId => $card){
+                    if($card->type == 40 || $card->type == 41){
+                        $this->cardDeck->playCard($cardId);
+                        //notify discard
+                        self::notifyAllPlayers('discardFromHand', clienttranslate('${player_name} discards ${card_name}'), array(
+                            'player_name' => $player_name,
+                            'player_id' => $player_id,
+                            'cardType' => $card->type,
+                            'cardId' => $cardId,
+                        ));
+                    }
                 }
                 break;
             }
             //Time Potion
+            //Immediately after the round ends, you get an extra round (all 4 phases). If more than one player use the Time Potion in the same round, they play in turns as if it were a normal round.
             case 42:
             case 43:{
                 //todo
@@ -541,7 +617,7 @@ class magicshop extends Table
 
 
         // Notify all players that cards were drawn
-        self::notifyAllPlayers( 'drawCards', clienttranslate( '${player_name} draws ${count} basic potions' ), array(
+        self::notifyAllPlayers( 'drawCardsPublic', clienttranslate( '${player_name} draws ${count} basic potions' ), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'type' => 'basic',
@@ -575,7 +651,7 @@ class magicshop extends Table
 
 
         // Notify all players that cards were drawn
-        self::notifyAllPlayers( 'drawCards', clienttranslate( '${player_name} draws ${count} advanced potion' ), array(
+        self::notifyAllPlayers( 'drawCardsPublic', clienttranslate( '${player_name} draws ${count} advanced potion' ), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'type' => 'advanced',
@@ -612,7 +688,7 @@ class magicshop extends Table
 
 
         // Notify all players that cards were drawn
-        self::notifyAllPlayers( 'drawCards', clienttranslate( '${player_name} draws ${item_name} from the item deck' ), array(
+        self::notifyAllPlayers( 'drawCardsPublic', clienttranslate( '${player_name} draws ${item_name} from the item deck' ), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
             'type' => 'item',

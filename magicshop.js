@@ -402,9 +402,11 @@ define([
                 // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
                 // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
                 // 
-                dojo.subscribe('drawCards', this, 'notif_drawCards');
+                dojo.subscribe('drawCardsPublic', this, 'notif_drawCardsPublic');
                 dojo.subscribe('drawCardsPersonal', this, 'notif_drawCardsPersonal');
                 dojo.subscribe('makePotionItem', this, 'notif_makePotionItem');
+                dojo.subscribe('cardActivated', this, 'notif_cardActivated');
+                dojo.subscribe('discardFromHand', this, 'notif_discardFromHand');
             },
 
             // TODO: from this point and below, you can write your game notifications handling methods
@@ -423,8 +425,8 @@ define([
             },    
         
             */
-           notif_drawCards: function(notif){
-               console.log('notif_drawCards');
+           notif_drawCardsPublic: function(notif){
+               console.log('notif_drawCardsPublic');
             //    notif.args.player_id
             //    notif.args.type
             //    notif.args.count
@@ -448,7 +450,7 @@ define([
 
 
             notif_drawCardsPersonal: function(notif) {
-                console.log('notif_drawCards');
+                console.log('notif_drawCardsPersonal');
                 // Cards in player's hand
                 for (var cardId in notif.args.cards) {
                     var card = notif.args.cards[cardId];
